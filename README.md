@@ -1,0 +1,1 @@
+# nuxt-i18n-hints
