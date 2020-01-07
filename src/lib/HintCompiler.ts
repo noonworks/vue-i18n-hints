@@ -1,5 +1,6 @@
 import * as ts from 'typescript';
 import { PathManager } from './PathManager';
+import { ASTTransformer } from './ASTTransformer';
 
 export interface HintCompilerOptions {
   tsconfig?: ts.CompilerOptions;
@@ -23,5 +24,16 @@ export class HintCompiler {
       rootDir: opt.rootDir || opt.tsconfig.rootDir || '.',
       postfix: opt.postfix || 'Hints'
     });
+  }
+
+  public compile(files: string[]): void {
+    const fls = files.map(f => {
+      return { source: f, dest: this._pmgr.transformPath(f) };
+    });
+    const trsfmr = new ASTTransformer({
+      files: fls,
+      tsconfig: this._opt.tsconfig
+    });
+    trsfmr.compile();
   }
 }
