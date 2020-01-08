@@ -1,34 +1,34 @@
 import * as ts from 'typescript';
 
 function identifer2String(name: ts.PropertyName): string {
-  if (name.kind === ts.SyntaxKind.Identifier) {
-    return name.text;
-  }
+  if (ts.isIdentifier(name)) return name.text;
   // does not support other than identifer
   return '';
 }
 
 function createStringProperty(
-  name: ts.PropertyName,
+  identifer: ts.PropertyName,
+  name: string,
   prefix: string
-): ts.PropertyAssignment | null {
-  const id = identifer2String(name);
-  if (!id) return null;
-  const propVal = ts.createStringLiteral(prefix + id);
-  return ts.createPropertyAssignment(name, propVal);
+): ts.PropertyAssignment {
+  const propVal = ts.createStringLiteral(prefix + name);
+  return ts.createPropertyAssignment(identifer, propVal);
 }
 
 function createNestedProperty(
-  propSig: ts.PropertySignature,
+  members: ts.NodeArray<ts.TypeElement>,
+  identifer: ts.PropertyName,
+  name: string,
   prefix: string
-): ts.PropertyAssignment | null {
-  const name = identifer2String(propSig.name);
-  if (!name) return null;
-  const tl = propSig.type as ts.TypeLiteralNode;
-  // eslint-disable-next-line @typescript-eslint/no-use-before-define
-  const children = createChildren(tl.members, prefix + name + '.');
-  const objLtr = ts.createObjectLiteral(children, true);
-  return ts.createPropertyAssignment(name, objLtr);
+): ts.PropertyAssignment {
+  return ts.createPropertyAssignment(
+    identifer,
+    ts.createObjectLiteral(
+      // eslint-disable-next-line @typescript-eslint/no-use-before-define
+      createChildren(members, prefix + name + '.'),
+      true
+    )
+  );
 }
 
 function createChildren(
@@ -38,17 +38,22 @@ function createChildren(
   const result: Array<ts.ObjectLiteralElementLike> = [];
   members.forEach(member => {
     if (member.kind !== ts.SyntaxKind.PropertySignature) return;
-    const propSig = member as ts.PropertySignature;
-    if (!propSig.type) return;
+    if (!ts.isPropertySignature(member)) return;
+    if (!member.type) return;
+    // get name as string
+    const name = identifer2String(member.name);
+    if (!name) return;
     // string
-    if (propSig.type.kind === ts.SyntaxKind.StringKeyword) {
-      const node = createStringProperty(propSig.name, prefix);
-      if (node) result.push(node);
+    if (member.type.kind === ts.SyntaxKind.StringKeyword) {
+      result.push(createStringProperty(member.name, name, prefix));
+      return;
     }
     // nested type literal
-    if (propSig.type.kind === ts.SyntaxKind.TypeLiteral) {
-      const node = createNestedProperty(propSig, prefix);
-      if (node) result.push(node);
+    if (ts.isTypeLiteralNode(member.type)) {
+      result.push(
+        createNestedProperty(member.type.members, member.name, name, prefix)
+      );
+      return;
     }
   });
   return result;
