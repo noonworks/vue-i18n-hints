@@ -6,7 +6,7 @@ function identifer2String(name: ts.PropertyName): string {
   return '';
 }
 
-function createStringProperty(
+function createString(
   identifer: ts.PropertyName,
   name: string,
   prefix: string
@@ -15,7 +15,7 @@ function createStringProperty(
   return ts.createPropertyAssignment(identifer, propVal);
 }
 
-function createNestedProperty(
+function createNested(
   members: ts.NodeArray<ts.TypeElement>,
   identifer: ts.PropertyName,
   name: string,
@@ -31,7 +31,7 @@ function createNestedProperty(
   );
 }
 
-function createStringArrayProperty(
+function createStringArray(
   length: number,
   identifer: ts.PropertyName,
   name: string,
@@ -60,14 +60,12 @@ function createChildren(
     if (!name) return;
     // string
     if (member.type.kind === ts.SyntaxKind.StringKeyword) {
-      result.push(createStringProperty(member.name, name, prefix));
+      result.push(createString(member.name, name, prefix));
       return;
     }
     // nested type literal
     if (ts.isTypeLiteralNode(member.type)) {
-      result.push(
-        createNestedProperty(member.type.members, member.name, name, prefix)
-      );
+      result.push(createNested(member.type.members, member.name, name, prefix));
       return;
     }
     // literal
@@ -84,9 +82,10 @@ function createChildren(
       // get length
       const len = lengthInfo[name + 'Length'];
       if (typeof len === 'undefined' || len <= 0) return;
+      const elmType = member.type.elementType;
       // string array
-      if (member.type.elementType.kind === ts.SyntaxKind.StringKeyword) {
-        result.push(createStringArrayProperty(len, member.name, name, prefix));
+      if (elmType.kind === ts.SyntaxKind.StringKeyword) {
+        result.push(createStringArray(len, member.name, name, prefix));
         return;
       }
       return;
@@ -102,7 +101,7 @@ function createChildren(
       if (typeof len === 'undefined' || len <= 0) return;
       // Array<string>
       if (tArgs.length === 1 && tArgs[0].kind === ts.SyntaxKind.StringKeyword) {
-        result.push(createStringArrayProperty(len, member.name, name, prefix));
+        result.push(createStringArray(len, member.name, name, prefix));
         return;
       }
       return;
