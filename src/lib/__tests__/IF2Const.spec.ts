@@ -1,18 +1,14 @@
-import { ASTTransformer } from '../ASTTransformer';
+import { IF2Const } from '../IF2Const';
+import { MockTransformer } from '../MockTransformer';
 
-describe('ASTTransformer', () => {
+describe('IF2Const', () => {
   test('transform simple interface', () => {
-    const trfmr = new ASTTransformer({
-      files: [
-        {
-          source: 'example/simple.d.ts',
-          dest: 'lang/hints/simpleHints.ts'
-        }
-      ]
+    const trfmr = new MockTransformer({
+      files: ['example/simple.d.ts'],
+      transformers: [IF2Const]
     });
     const result = trfmr.compile();
     expect(result.length).toBe(1);
-    expect(result[0].path).toEqual('lang/hints/simpleHints.ts');
     expect(result[0].source).toEqual(
       `export const SimpleHints = {
     elem1: "elem1",
@@ -23,17 +19,12 @@ describe('ASTTransformer', () => {
   });
 
   test('transform nested interface', () => {
-    const trfmr = new ASTTransformer({
-      files: [
-        {
-          source: 'example/nest.d.ts',
-          dest: 'lang/hints/nestHints.ts'
-        }
-      ]
+    const trfmr = new MockTransformer({
+      files: ['example/nest.d.ts'],
+      transformers: [IF2Const]
     });
     const result = trfmr.compile();
     expect(result.length).toBe(1);
-    expect(result[0].path).toEqual('lang/hints/nestHints.ts');
     expect(result[0].source).toEqual(
       `export const NestHints = {
     elem1: "elem1",
@@ -52,17 +43,12 @@ describe('ASTTransformer', () => {
   });
 
   test('transform interface with string[]', () => {
-    const trfmr = new ASTTransformer({
-      files: [
-        {
-          source: 'example/stringArr.d.ts',
-          dest: 'lang/hints/stringArrHints.ts'
-        }
-      ]
+    const trfmr = new MockTransformer({
+      files: ['example/stringArr.d.ts'],
+      transformers: [IF2Const]
     });
     const result = trfmr.compile();
     expect(result.length).toBe(1);
-    expect(result[0].path).toEqual('lang/hints/stringArrHints.ts');
     expect(result[0].source).toEqual(
       `export const StringArrHints = {
     elem1: "elem1",
@@ -79,17 +65,12 @@ describe('ASTTransformer', () => {
   });
 
   test('transform interface with Array<string>', () => {
-    const trfmr = new ASTTransformer({
-      files: [
-        {
-          source: 'example/stringArr2.d.ts',
-          dest: 'lang/hints/stringArr2Hints.ts'
-        }
-      ]
+    const trfmr = new MockTransformer({
+      files: ['example/stringArr2.d.ts'],
+      transformers: [IF2Const]
     });
     const result = trfmr.compile();
     expect(result.length).toBe(1);
-    expect(result[0].path).toEqual('lang/hints/stringArr2Hints.ts');
     expect(result[0].source).toEqual(
       `export const StringArr2Hints = {
     elem1: "elem1",
@@ -106,17 +87,12 @@ describe('ASTTransformer', () => {
   });
 
   test('transform interface with object array', () => {
-    const trfmr = new ASTTransformer({
-      files: [
-        {
-          source: 'example/ObjectArr.d.ts',
-          dest: 'lang/hints/ObjectArrHints.ts'
-        }
-      ]
+    const trfmr = new MockTransformer({
+      files: ['example/ObjectArr.d.ts'],
+      transformers: [IF2Const]
     });
     const result = trfmr.compile();
     expect(result.length).toBe(1);
-    expect(result[0].path).toEqual('lang/hints/ObjectArrHints.ts');
     expect(result[0].source).toEqual(
       `export const ObjectArrHints = {
     elem1: "elem1",
@@ -140,17 +116,12 @@ describe('ASTTransformer', () => {
   });
 
   test('transform interface with object array', () => {
-    const trfmr = new ASTTransformer({
-      files: [
-        {
-          source: 'example/ObjectArr2.d.ts',
-          dest: 'lang/hints/ObjectArr2Hints.ts'
-        }
-      ]
+    const trfmr = new MockTransformer({
+      files: ['example/ObjectArr2.d.ts'],
+      transformers: [IF2Const]
     });
     const result = trfmr.compile();
     expect(result.length).toBe(1);
-    expect(result[0].path).toEqual('lang/hints/ObjectArr2Hints.ts');
     expect(result[0].source).toEqual(
       `export const ObjectArr2Hints = {
     elem1: "elem1",
