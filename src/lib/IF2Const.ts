@@ -31,11 +31,26 @@ function createNestedProperty(
   );
 }
 
+function createStringArrayProperty(
+  length: number,
+  identifer: ts.PropertyName,
+  name: string,
+  prefix: string
+): ts.PropertyAssignment {
+  const nodes: ts.Expression[] = [];
+  for (let i = 0; i < length; i++) {
+    nodes.push(ts.createStringLiteral(prefix + name + '[' + i + ']'));
+  }
+  const arrLt = ts.createArrayLiteral(nodes, true);
+  return ts.createPropertyAssignment(identifer, arrLt);
+}
+
 function createChildren(
   members: ts.NodeArray<ts.TypeElement>,
   prefix: string
 ): Array<ts.ObjectLiteralElementLike> {
   const result: Array<ts.ObjectLiteralElementLike> = [];
+  const lengthInfo: { [key: string]: number } = {};
   members.forEach(member => {
     if (member.kind !== ts.SyntaxKind.PropertySignature) return;
     if (!ts.isPropertySignature(member)) return;
@@ -53,6 +68,43 @@ function createChildren(
       result.push(
         createNestedProperty(member.type.members, member.name, name, prefix)
       );
+      return;
+    }
+    // literal
+    if (ts.isLiteralTypeNode(member.type)) {
+      if (ts.isNumericLiteral(member.type.literal)) {
+        // numeric literal
+        const val = parseInt(member.type.literal.text);
+        if (!isNaN(val)) lengthInfo[prefix + name] = val;
+      }
+      return;
+    }
+    // array ([])
+    if (ts.isArrayTypeNode(member.type)) {
+      // get length
+      const len = lengthInfo[name + 'Length'];
+      if (typeof len === 'undefined' || len <= 0) return;
+      // string array
+      if (member.type.elementType.kind === ts.SyntaxKind.StringKeyword) {
+        result.push(createStringArrayProperty(len, member.name, name, prefix));
+        return;
+      }
+      return;
+    }
+    // type reference (Array<T>)
+    if (ts.isTypeReferenceNode(member.type)) {
+      const tname = member.type.typeName;
+      if (!ts.isIdentifier(tname) || tname.escapedText !== 'Array') return;
+      const tArgs = member.type.typeArguments;
+      if (!tArgs) return;
+      // get length
+      const len = lengthInfo[name + 'Length'];
+      if (typeof len === 'undefined' || len <= 0) return;
+      // Array<string>
+      if (tArgs.length === 1 && tArgs[0].kind === ts.SyntaxKind.StringKeyword) {
+        result.push(createStringArrayProperty(len, member.name, name, prefix));
+        return;
+      }
       return;
     }
   });

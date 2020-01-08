@@ -50,4 +50,58 @@ describe('ASTTransformer', () => {
 `
     );
   });
+
+  test('transform interface with string[]', () => {
+    const trfmr = new ASTTransformer({
+      files: [
+        {
+          source: 'example/stringArr.d.ts',
+          dest: 'lang/hints/stringArrHints.ts'
+        }
+      ]
+    });
+    const result = trfmr.compile();
+    expect(result.length).toBe(1);
+    expect(result[0].path).toEqual('lang/hints/stringArrHints.ts');
+    expect(result[0].source).toEqual(
+      `export const StringArrHints = {
+    elem1: "elem1",
+    elem2: [
+        "elem2[0]",
+        "elem2[1]",
+        "elem2[2]",
+        "elem2[3]",
+        "elem2[4]"
+    ]
+};
+`
+    );
+  });
+
+  test('transform interface with Array<string>', () => {
+    const trfmr = new ASTTransformer({
+      files: [
+        {
+          source: 'example/stringArr2.d.ts',
+          dest: 'lang/hints/stringArr2Hints.ts'
+        }
+      ]
+    });
+    const result = trfmr.compile();
+    expect(result.length).toBe(1);
+    expect(result[0].path).toEqual('lang/hints/stringArr2Hints.ts');
+    expect(result[0].source).toEqual(
+      `export const StringArr2Hints = {
+    elem1: "elem1",
+    elem2: [
+        "elem2[0]",
+        "elem2[1]",
+        "elem2[2]",
+        "elem2[3]",
+        "elem2[4]"
+    ]
+};
+`
+    );
+  });
 });
