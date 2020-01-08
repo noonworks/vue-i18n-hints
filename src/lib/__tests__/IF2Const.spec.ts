@@ -10,7 +10,7 @@ describe('IF2Const', () => {
     const result = trfmr.compile();
     expect(result.length).toBe(1);
     expect(result[0].source).toEqual(
-      `export const SimpleHints = {
+      `export const SimpleHints: Simple = {
     elem1: "elem1",
     elem2: "elem2"
 };
@@ -26,7 +26,7 @@ describe('IF2Const', () => {
     const result = trfmr.compile();
     expect(result.length).toBe(1);
     expect(result[0].source).toEqual(
-      `export const NestHints = {
+      `export const NestHints: Nest = {
     elem1: "elem1",
     elem2: "elem2",
     nested: {
@@ -50,7 +50,7 @@ describe('IF2Const', () => {
     const result = trfmr.compile();
     expect(result.length).toBe(1);
     expect(result[0].source).toEqual(
-      `export const StringArrHints = {
+      `export const StringArrHints: StringArr = {
     elem1: "elem1",
     elem2: [
         "elem2[0]",
@@ -72,7 +72,7 @@ describe('IF2Const', () => {
     const result = trfmr.compile();
     expect(result.length).toBe(1);
     expect(result[0].source).toEqual(
-      `export const StringArr2Hints = {
+      `export const StringArr2Hints: StringArr2 = {
     elem1: "elem1",
     elem2: [
         "elem2[0]",
@@ -94,7 +94,7 @@ describe('IF2Const', () => {
     const result = trfmr.compile();
     expect(result.length).toBe(1);
     expect(result[0].source).toEqual(
-      `export const ObjectArrHints = {
+      `export const ObjectArrHints: ObjectArr = {
     elem1: "elem1",
     elem2: [
         {
@@ -123,7 +123,7 @@ describe('IF2Const', () => {
     const result = trfmr.compile();
     expect(result.length).toBe(1);
     expect(result[0].source).toEqual(
-      `export const ObjectArr2Hints = {
+      `export const ObjectArr2Hints: ObjectArr2 = {
     elem1: "elem1",
     elem2: [
         {

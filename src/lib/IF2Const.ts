@@ -155,9 +155,11 @@ export function IF2Const<T extends ts.Node>(
 
     // new Identifer
     const newName = ts.createIdentifier(ifDecl.name.escapedText + 'Hints');
-    ifDecl.name = newName;
     // new const variable
-    const varDecl = ts.createVariableDeclaration(ifDecl.name);
+    const varDecl = ts.createVariableDeclaration(
+      newName,
+      ts.createTypeReferenceNode(ifDecl.name, undefined)
+    );
     const declList = ts.createVariableDeclarationList(
       [varDecl],
       ts.NodeFlags.Const
