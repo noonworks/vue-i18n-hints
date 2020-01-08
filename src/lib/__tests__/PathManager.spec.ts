@@ -3,7 +3,11 @@ import * as pt from 'path';
 
 describe('PathManager', () => {
   test('transform path', () => {
-    const mgr = new PathManager();
+    const mgr = new PathManager({
+      sourceDir: '',
+      hintsDir: '',
+      postfix: 'Hints'
+    });
     {
       const path = 'example/simple.d.ts';
       const dist = mgr.transformPath(path);
@@ -23,6 +27,8 @@ describe('PathManager', () => {
 
   test('transform path with postfix', () => {
     const mgr = new PathManager({
+      sourceDir: '',
+      hintsDir: '',
       postfix: 'hints'
     });
     {
@@ -39,7 +45,9 @@ describe('PathManager', () => {
 
   test('transform path to hintsDir', () => {
     const mgr = new PathManager({
-      hintsDir: 'lang'
+      sourceDir: '',
+      hintsDir: 'lang',
+      postfix: 'Hints'
     });
     {
       const path = 'example/simple.d.ts';
@@ -55,7 +63,9 @@ describe('PathManager', () => {
 
   test('transform path in rootDir', () => {
     const mgr = new PathManager({
-      rootDir: 'example'
+      sourceDir: 'example',
+      hintsDir: '',
+      postfix: 'Hints'
     });
     {
       const path = 'example/simple.d.ts';
@@ -71,13 +81,14 @@ describe('PathManager', () => {
 
   test('transform path out of rootDir', () => {
     const mgr = new PathManager({
+      sourceDir: 'example',
       hintsDir: 'lang',
-      rootDir: 'example'
+      postfix: 'Hints'
     });
     {
       const path = 'dummy/simple.d.ts';
       const dist = mgr.transformPath(path);
-      expect(dist).toBe(pt.join('lang', 'dummy', 'simpleHints.ts'));
+      expect(dist).toBe(pt.join('dummy', 'simpleHints.ts'));
     }
     {
       const path = './example/simple.d.ts';

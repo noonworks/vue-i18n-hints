@@ -1,46 +1,42 @@
-import * as pt from 'path';
+import {
+  basename,
+  extname,
+  dirname,
+  resolve,
+  relative,
+  normalize,
+  join
+} from 'path';
 
 interface PathManagerOptions {
-  curDir?: string;
-  hintsDir?: string;
-  rootDir?: string;
-  postfix?: string;
+  sourceDir: string;
+  hintsDir: string;
+  postfix: string;
 }
 
 const D_TS_EXT = /\.d\.ts$/i;
 
 export class PathManager {
-  private _curDir: string;
-  private _hintsDir: string;
-  private _rootDir: string;
-  private _postfix: string;
+  private _opt: PathManagerOptions;
+  private _absSrc: string;
 
-  constructor(opt?: PathManagerOptions) {
-    opt = opt || {};
-    this._curDir = opt.curDir || process.cwd();
-    this._hintsDir = pt.resolve(opt.hintsDir || '.');
-    this._rootDir = pt.resolve(opt.rootDir || '.');
-    this._postfix = opt.postfix || 'Hints';
+  constructor(opt: PathManagerOptions) {
+    this._opt = opt;
+    this._absSrc = resolve(opt.sourceDir);
   }
 
-  private getExt(path: string): string {
-    if (D_TS_EXT.test(path)) return '.d.ts';
-    return pt.extname(path);
-  }
-
-  public transformPath(path: string): string {
-    const abs = pt.resolve(path);
-    const ext = this.getExt(path);
-    const base = pt.basename(path, ext);
+  private getDestBase(path: string): string {
+    const ext = D_TS_EXT.test(path) ? '.d.ts' : extname(path);
     const distext = ext === '.d.ts' ? '.ts' : ext;
-    const distname = base + this._postfix + distext;
-    if (abs.startsWith(this._rootDir)) {
-      const dir = pt.dirname(abs.replace(this._rootDir, ''));
-      const out = pt.join(this._hintsDir, dir, distname);
-      return pt.relative(this._curDir, out);
-    }
-    const dir = pt.dirname(path);
-    const out = pt.join(this._hintsDir, dir, distname);
-    return pt.relative(this._curDir, out);
+    const base = basename(path, ext);
+    return base + this._opt.postfix + distext;
+  }
+
+  public transformPath(src: string): string {
+    const absSrc = resolve(src);
+    const relSrc = relative(this._absSrc, absSrc);
+    const relDir = dirname(relSrc);
+    const destbase = this.getDestBase(src);
+    return normalize(join(this._opt.hintsDir, relDir, destbase));
   }
 }
