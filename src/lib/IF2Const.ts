@@ -18,6 +18,19 @@ function createStringProperty(
   return ts.createPropertyAssignment(name, propVal);
 }
 
+function createNestedProperty(
+  propSig: ts.PropertySignature,
+  prefix: string
+): ts.PropertyAssignment | null {
+  const name = identifer2String(propSig.name);
+  if (!name) return null;
+  const tl = propSig.type as ts.TypeLiteralNode;
+  // eslint-disable-next-line @typescript-eslint/no-use-before-define
+  const children = createChildren(tl.members, prefix + name + '.');
+  const objLtr = ts.createObjectLiteral(children, true);
+  return ts.createPropertyAssignment(name, objLtr);
+}
+
 function createChildren(
   members: ts.NodeArray<ts.TypeElement>,
   prefix: string
@@ -26,11 +39,15 @@ function createChildren(
   members.forEach(member => {
     if (member.kind !== ts.SyntaxKind.PropertySignature) return;
     const propSig = member as ts.PropertySignature;
-    // value
     if (!propSig.type) return;
-    const typenode = propSig.type;
-    if (typenode.kind === ts.SyntaxKind.StringKeyword) {
+    // string
+    if (propSig.type.kind === ts.SyntaxKind.StringKeyword) {
       const node = createStringProperty(propSig.name, prefix);
+      if (node) result.push(node);
+    }
+    // nested type literal
+    if (propSig.type.kind === ts.SyntaxKind.TypeLiteral) {
+      const node = createNestedProperty(propSig, prefix);
       if (node) result.push(node);
     }
   });
