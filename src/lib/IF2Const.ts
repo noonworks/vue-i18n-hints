@@ -45,6 +45,25 @@ function createStringArray(
   return ts.createPropertyAssignment(identifer, arrLt);
 }
 
+function createTypeLiteralArray(
+  typeLtr: ts.TypeLiteralNode,
+  length: number,
+  identifer: ts.PropertyName,
+  name: string,
+  prefix: string
+): ts.PropertyAssignment {
+  const nodes: ts.Expression[] = [];
+  for (let i = 0; i < length; i++) {
+    const curPrefix = prefix + name + '[' + i + '].';
+    nodes.push(
+      // eslint-disable-next-line @typescript-eslint/no-use-before-define
+      ts.createObjectLiteral(createChildren(typeLtr.members, curPrefix), true)
+    );
+  }
+  const arrLt = ts.createArrayLiteral(nodes, true);
+  return ts.createPropertyAssignment(identifer, arrLt);
+}
+
 function createChildren(
   members: ts.NodeArray<ts.TypeElement>,
   prefix: string
@@ -88,20 +107,35 @@ function createChildren(
         result.push(createStringArray(len, member.name, name, prefix));
         return;
       }
+      // type literal array
+      if (ts.isTypeLiteralNode(elmType)) {
+        result.push(
+          createTypeLiteralArray(elmType, len, member.name, name, prefix)
+        );
+        return;
+      }
       return;
     }
     // type reference (Array<T>)
     if (ts.isTypeReferenceNode(member.type)) {
       const tname = member.type.typeName;
       if (!ts.isIdentifier(tname) || tname.escapedText !== 'Array') return;
-      const tArgs = member.type.typeArguments;
-      if (!tArgs) return;
+      if (!member.type.typeArguments || member.type.typeArguments.length != 1)
+        return;
+      const tArg = member.type.typeArguments[0];
       // get length
       const len = lengthInfo[name + 'Length'];
       if (typeof len === 'undefined' || len <= 0) return;
       // Array<string>
-      if (tArgs.length === 1 && tArgs[0].kind === ts.SyntaxKind.StringKeyword) {
+      if (tArg.kind === ts.SyntaxKind.StringKeyword) {
         result.push(createStringArray(len, member.name, name, prefix));
+        return;
+      }
+      // Array<{}>
+      if (ts.isTypeLiteralNode(tArg)) {
+        result.push(
+          createTypeLiteralArray(tArg, len, member.name, name, prefix)
+        );
         return;
       }
       return;

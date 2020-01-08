@@ -104,4 +104,72 @@ describe('ASTTransformer', () => {
 `
     );
   });
+
+  test('transform interface with object array', () => {
+    const trfmr = new ASTTransformer({
+      files: [
+        {
+          source: 'example/ObjectArr.d.ts',
+          dest: 'lang/hints/ObjectArrHints.ts'
+        }
+      ]
+    });
+    const result = trfmr.compile();
+    expect(result.length).toBe(1);
+    expect(result[0].path).toEqual('lang/hints/ObjectArrHints.ts');
+    expect(result[0].source).toEqual(
+      `export const ObjectArrHints = {
+    elem1: "elem1",
+    elem2: [
+        {
+            elem3: "elem2[0].elem3",
+            elem4: "elem2[0].elem4"
+        },
+        {
+            elem3: "elem2[1].elem3",
+            elem4: "elem2[1].elem4"
+        },
+        {
+            elem3: "elem2[2].elem3",
+            elem4: "elem2[2].elem4"
+        }
+    ]
+};
+`
+    );
+  });
+
+  test('transform interface with object array', () => {
+    const trfmr = new ASTTransformer({
+      files: [
+        {
+          source: 'example/ObjectArr2.d.ts',
+          dest: 'lang/hints/ObjectArr2Hints.ts'
+        }
+      ]
+    });
+    const result = trfmr.compile();
+    expect(result.length).toBe(1);
+    expect(result[0].path).toEqual('lang/hints/ObjectArr2Hints.ts');
+    expect(result[0].source).toEqual(
+      `export const ObjectArr2Hints = {
+    elem1: "elem1",
+    elem2: [
+        {
+            elem3: "elem2[0].elem3",
+            elem4: "elem2[0].elem4"
+        },
+        {
+            elem3: "elem2[1].elem3",
+            elem4: "elem2[1].elem4"
+        },
+        {
+            elem3: "elem2[2].elem3",
+            elem4: "elem2[2].elem4"
+        }
+    ]
+};
+`
+    );
+  });
 });
