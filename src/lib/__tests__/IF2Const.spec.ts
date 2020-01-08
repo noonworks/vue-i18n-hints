@@ -1,16 +1,22 @@
-import { IF2Const } from '../IF2Const';
-import { MockTransformer } from '../MockTransformer';
+import { IF2ConstFactory } from '../IF2Const';
+import { MockTransformer, Factory } from '../MockTransformer';
+
+const factory: Factory = src => {
+  return IF2ConstFactory(src.fileName);
+};
 
 describe('IF2Const', () => {
   test('transform simple interface', () => {
     const trfmr = new MockTransformer({
       files: ['example/simple.d.ts'],
-      transformers: [IF2Const]
+      transformers: [],
+      transformerFactories: [factory]
     });
     const result = trfmr.compile();
     expect(result.length).toBe(1);
     expect(result[0].source).toEqual(
-      `export const SimpleHints: Simple = {
+      `import { Simple } from "example/simple.d.ts";
+export const SimpleHints: Simple = {
     elem1: "elem1",
     elem2: "elem2"
 };
@@ -21,12 +27,14 @@ describe('IF2Const', () => {
   test('transform nested interface', () => {
     const trfmr = new MockTransformer({
       files: ['example/nest.d.ts'],
-      transformers: [IF2Const]
+      transformers: [],
+      transformerFactories: [factory]
     });
     const result = trfmr.compile();
     expect(result.length).toBe(1);
     expect(result[0].source).toEqual(
-      `export const NestHints: Nest = {
+      `import { Nest } from "example/nest.d.ts";
+export const NestHints: Nest = {
     elem1: "elem1",
     elem2: "elem2",
     nested: {
@@ -45,12 +53,14 @@ describe('IF2Const', () => {
   test('transform interface with string[]', () => {
     const trfmr = new MockTransformer({
       files: ['example/stringArr.d.ts'],
-      transformers: [IF2Const]
+      transformers: [],
+      transformerFactories: [factory]
     });
     const result = trfmr.compile();
     expect(result.length).toBe(1);
     expect(result[0].source).toEqual(
-      `export const StringArrHints: StringArr = {
+      `import { StringArr } from "example/stringArr.d.ts";
+export const StringArrHints: StringArr = {
     elem1: "elem1",
     elem2: [
         "elem2[0]",
@@ -67,12 +77,14 @@ describe('IF2Const', () => {
   test('transform interface with Array<string>', () => {
     const trfmr = new MockTransformer({
       files: ['example/stringArr2.d.ts'],
-      transformers: [IF2Const]
+      transformers: [],
+      transformerFactories: [factory]
     });
     const result = trfmr.compile();
     expect(result.length).toBe(1);
     expect(result[0].source).toEqual(
-      `export const StringArr2Hints: StringArr2 = {
+      `import { StringArr2 } from "example/stringArr2.d.ts";
+export const StringArr2Hints: StringArr2 = {
     elem1: "elem1",
     elem2: [
         "elem2[0]",
@@ -89,12 +101,14 @@ describe('IF2Const', () => {
   test('transform interface with object array', () => {
     const trfmr = new MockTransformer({
       files: ['example/ObjectArr.d.ts'],
-      transformers: [IF2Const]
+      transformers: [],
+      transformerFactories: [factory]
     });
     const result = trfmr.compile();
     expect(result.length).toBe(1);
     expect(result[0].source).toEqual(
-      `export const ObjectArrHints: ObjectArr = {
+      `import { ObjectArr } from "example/ObjectArr.d.ts";
+export const ObjectArrHints: ObjectArr = {
     elem1: "elem1",
     elem2: [
         {
@@ -118,12 +132,14 @@ describe('IF2Const', () => {
   test('transform interface with object array', () => {
     const trfmr = new MockTransformer({
       files: ['example/ObjectArr2.d.ts'],
-      transformers: [IF2Const]
+      transformers: [],
+      transformerFactories: [factory]
     });
     const result = trfmr.compile();
     expect(result.length).toBe(1);
     expect(result[0].source).toEqual(
-      `export const ObjectArr2Hints: ObjectArr2 = {
+      `import { ObjectArr2 } from "example/ObjectArr2.d.ts";
+export const ObjectArr2Hints: ObjectArr2 = {
     elem1: "elem1",
     elem2: [
         {

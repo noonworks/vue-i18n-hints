@@ -114,7 +114,6 @@ function createChildren(
         );
         return;
       }
-      return;
     }
     // type reference (Array<T>)
     if (ts.isTypeReferenceNode(member.type)) {
@@ -138,7 +137,6 @@ function createChildren(
         );
         return;
       }
-      return;
     }
   });
   return result;
@@ -169,13 +167,43 @@ function createConst(ifDecl: ts.InterfaceDeclaration): ts.VariableStatement {
   return newNode;
 }
 
-export function IF2Const<T extends ts.Node>(
-  context: ts.TransformationContext
-): ts.Transformer<T> {
-  const visit: ts.Visitor = (node: ts.Node): ts.Node | undefined => {
-    node = ts.visitEachChild(node, visit, context);
-    if (!ts.isInterfaceDeclaration(node)) return node;
-    return createConst(node);
-  };
-  return (rootNode: T): T => ts.visitNode(rootNode, visit);
+function createImportNode(path: string, names: string[]): ts.ImportDeclaration {
+  return ts.createImportDeclaration(
+    undefined,
+    undefined,
+    ts.createImportClause(
+      undefined,
+      ts.createNamedImports(
+        names.map(n =>
+          ts.createImportSpecifier(undefined, ts.createIdentifier(n))
+        )
+      )
+    ),
+    ts.createStringLiteral(path)
+  );
+}
+
+export function IF2ConstFactory<T extends ts.Node>(
+  filepath: string
+): ts.TransformerFactory<T> {
+  function IF2Const<T extends ts.Node>(
+    context: ts.TransformationContext
+  ): ts.Transformer<T> {
+    const interfaces: string[] = [];
+    const visit: ts.Visitor = (node: ts.Node): ts.Node | undefined => {
+      node = ts.visitEachChild(node, visit, context);
+      if (!ts.isInterfaceDeclaration(node)) return node;
+      interfaces.push(node.name.text);
+      return createConst(node);
+    };
+    return (rootNode: T): T => {
+      const visited = ts.visitNode(rootNode, visit);
+      if (ts.isSourceFile(visited)) {
+        const impt = createImportNode(filepath, interfaces);
+        visited.statements = ts.createNodeArray([impt, ...visited.statements]);
+      }
+      return visited;
+    };
+  }
+  return IF2Const;
 }
