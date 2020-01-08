@@ -144,42 +144,38 @@ function createChildren(
   return result;
 }
 
+function createConst(ifDecl: ts.InterfaceDeclaration): ts.VariableStatement {
+  // new Identifer
+  const newName = ts.createIdentifier(ifDecl.name.escapedText + 'Hints');
+  // object literal
+  const objLtr = ts.createObjectLiteral(
+    ts.createNodeArray(createChildren(ifDecl.members, '')),
+    true
+  );
+  // new node
+  const newNode = ts.createVariableStatement(
+    [ts.createModifier(ts.SyntaxKind.ExportKeyword)],
+    ts.createVariableDeclarationList(
+      [
+        ts.createVariableDeclaration(
+          newName,
+          ts.createTypeReferenceNode(ifDecl.name, undefined),
+          objLtr
+        )
+      ],
+      ts.NodeFlags.Const
+    )
+  );
+  return newNode;
+}
+
 export function IF2Const<T extends ts.Node>(
   context: ts.TransformationContext
 ): ts.Transformer<T> {
-  const InterfaceVisitor: ts.Visitor = (node: ts.Node): ts.Node | undefined => {
-    node = ts.visitEachChild(node, InterfaceVisitor, context);
+  const visit: ts.Visitor = (node: ts.Node): ts.Node | undefined => {
+    node = ts.visitEachChild(node, visit, context);
     if (!ts.isInterfaceDeclaration(node)) return node;
-
-    const ifDecl: ts.InterfaceDeclaration = node;
-
-    // new Identifer
-    const newName = ts.createIdentifier(ifDecl.name.escapedText + 'Hints');
-    // new const variable
-    const varDecl = ts.createVariableDeclaration(
-      newName,
-      ts.createTypeReferenceNode(ifDecl.name, undefined)
-    );
-    const declList = ts.createVariableDeclarationList(
-      [varDecl],
-      ts.NodeFlags.Const
-    );
-    const newNode = ts.createVariableStatement(
-      [ts.createModifier(ts.SyntaxKind.ExportKeyword)],
-      declList
-    );
-
-    // add members to new const variable
-    const props: Array<ts.ObjectLiteralElementLike> = createChildren(
-      ifDecl.members,
-      ''
-    );
-
-    // return newNode;
-    const propsNodes = ts.createNodeArray<ts.ObjectLiteralElementLike>(props);
-    const objLtr = ts.createObjectLiteral(propsNodes, true);
-    varDecl.initializer = objLtr;
-    return newNode;
+    return createConst(node);
   };
-  return (rootNode: T): T => ts.visitNode(rootNode, InterfaceVisitor);
+  return (rootNode: T): T => ts.visitNode(rootNode, visit);
 }
