@@ -1,5 +1,5 @@
 import { PathManager } from '../PathManager';
-import * as pt from 'path';
+import { posix } from 'path';
 
 describe('PathManager', () => {
   test('transform path', () => {
@@ -10,18 +10,18 @@ describe('PathManager', () => {
     });
     {
       const path = 'example/simple.d.ts';
-      const dist = mgr.transformPath(path);
-      expect(dist).toBe(pt.join('example', 'simpleHints.ts'));
+      const dist = mgr.dest(path);
+      expect(dist).toBe(posix.join('example', 'simpleHints.ts'));
     }
     {
       const path = 'example/simple.ts';
-      const dist = mgr.transformPath(path);
-      expect(dist).toBe(pt.join('example', 'simpleHints.ts'));
+      const dist = mgr.dest(path);
+      expect(dist).toBe(posix.join('example', 'simpleHints.ts'));
     }
     {
       const path = 'example/dir/simple.d.ts';
-      const dist = mgr.transformPath(path);
-      expect(dist).toBe(pt.join('example', 'dir', 'simpleHints.ts'));
+      const dist = mgr.dest(path);
+      expect(dist).toBe(posix.join('example', 'dir', 'simpleHints.ts'));
     }
   });
 
@@ -33,13 +33,13 @@ describe('PathManager', () => {
     });
     {
       const path = 'example/simple.d.ts';
-      const dist = mgr.transformPath(path);
-      expect(dist).toBe(pt.join('example', 'simplehints.ts'));
+      const dist = mgr.dest(path);
+      expect(dist).toBe(posix.join('example', 'simplehints.ts'));
     }
     {
       const path = 'example/dir/simple.d.ts';
-      const dist = mgr.transformPath(path);
-      expect(dist).toBe(pt.join('example', 'dir', 'simplehints.ts'));
+      const dist = mgr.dest(path);
+      expect(dist).toBe(posix.join('example', 'dir', 'simplehints.ts'));
     }
   });
 
@@ -51,13 +51,13 @@ describe('PathManager', () => {
     });
     {
       const path = 'example/simple.d.ts';
-      const dist = mgr.transformPath(path);
-      expect(dist).toBe(pt.join('lang', 'example', 'simpleHints.ts'));
+      const dist = mgr.dest(path);
+      expect(dist).toBe(posix.join('lang', 'example', 'simpleHints.ts'));
     }
     {
       const path = 'example/dir/simple.d.ts';
-      const dist = mgr.transformPath(path);
-      expect(dist).toBe(pt.join('lang', 'example', 'dir', 'simpleHints.ts'));
+      const dist = mgr.dest(path);
+      expect(dist).toBe(posix.join('lang', 'example', 'dir', 'simpleHints.ts'));
     }
   });
 
@@ -69,13 +69,13 @@ describe('PathManager', () => {
     });
     {
       const path = 'example/simple.d.ts';
-      const dist = mgr.transformPath(path);
-      expect(dist).toBe(pt.join('simpleHints.ts'));
+      const dist = mgr.dest(path);
+      expect(dist).toBe(posix.join('simpleHints.ts'));
     }
     {
       const path = 'example/dir/simple.d.ts';
-      const dist = mgr.transformPath(path);
-      expect(dist).toBe(pt.join('dir', 'simpleHints.ts'));
+      const dist = mgr.dest(path);
+      expect(dist).toBe(posix.join('dir', 'simpleHints.ts'));
     }
   });
 
@@ -87,13 +87,13 @@ describe('PathManager', () => {
     });
     {
       const path = 'dummy/simple.d.ts';
-      const dist = mgr.transformPath(path);
-      expect(dist).toBe(pt.join('dummy', 'simpleHints.ts'));
+      const dist = mgr.dest(path);
+      expect(dist).toBe(posix.join('dummy', 'simpleHints.ts'));
     }
     {
       const path = './example/simple.d.ts';
-      const dist = mgr.transformPath(path);
-      expect(dist).toBe(pt.join('lang', 'simpleHints.ts'));
+      const dist = mgr.dest(path);
+      expect(dist).toBe(posix.join('lang', 'simpleHints.ts'));
     }
   });
 });

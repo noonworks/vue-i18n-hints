@@ -1,12 +1,5 @@
-import {
-  basename,
-  extname,
-  dirname,
-  resolve,
-  relative,
-  normalize,
-  join
-} from 'path';
+import { posix } from 'path';
+import { mkdirSync, writeFileSync } from 'fs';
 
 interface PathManagerOptions {
   sourceDir: string;
@@ -22,21 +15,38 @@ export class PathManager {
 
   constructor(opt: PathManagerOptions) {
     this._opt = opt;
-    this._absSrc = resolve(opt.sourceDir);
+    this._absSrc = posix.resolve(opt.sourceDir);
   }
 
-  private getDestBase(path: string): string {
-    const ext = D_TS_EXT.test(path) ? '.d.ts' : extname(path);
-    const distext = ext === '.d.ts' ? '.ts' : ext;
-    const base = basename(path, ext);
-    return base + this._opt.postfix + distext;
+  private getBase(path: string): { base: string; ext: string } {
+    const ext = D_TS_EXT.test(path) ? '.d.ts' : posix.extname(path);
+    return { base: posix.basename(path, ext), ext };
   }
 
-  public transformPath(src: string): string {
-    const absSrc = resolve(src);
-    const relSrc = relative(this._absSrc, absSrc);
-    const relDir = dirname(relSrc);
-    const destbase = this.getDestBase(src);
-    return normalize(join(this._opt.hintsDir, relDir, destbase));
+  private getDestFilename(path: string): string {
+    const base = this.getBase(path);
+    const distext = base.ext === '.d.ts' ? '.ts' : base.ext;
+    return base.base + this._opt.postfix + distext;
+  }
+
+  public dest(src: string): string {
+    const absSrc = posix.resolve(src);
+    const relSrc = posix.relative(this._absSrc, absSrc);
+    const relDir = posix.dirname(relSrc);
+    const destbase = this.getDestFilename(src);
+    return posix.normalize(posix.join(this._opt.hintsDir, relDir, destbase));
+  }
+
+  public importPath(path: string): string {
+    const destdir = posix.dirname(this.dest(path));
+    const impdir = posix.relative(destdir, posix.dirname(path));
+    const imp = posix.join(impdir, this.getBase(path).base);
+    return posix.normalize(imp);
+  }
+
+  public save(path: string, source: string): void {
+    const dir = posix.dirname(path);
+    mkdirSync(dir, { recursive: true });
+    writeFileSync(path, source);
   }
 }
