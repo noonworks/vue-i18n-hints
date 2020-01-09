@@ -1,26 +1,27 @@
 import * as ts from 'typescript';
 
-export type Factory = (
+export type HintTransformerFactory = (
   src: ts.SourceFile
 ) => ts.TransformerFactory<ts.SourceFile>;
 
-export interface MockTransformerOption {
+export interface HintTransformerOption {
   files: string[];
   tsconfig?: ts.CompilerOptions;
   transformers: ts.TransformerFactory<ts.SourceFile>[];
-  transformerFactories: Factory[];
+  transformerFactories: HintTransformerFactory[];
 }
 
-export interface MockTransformResult {
+export interface HintTransformermResult {
+  filename: string;
   source: string;
 }
 
-export class MockTransformer {
-  private _opt: MockTransformerOption;
+export class HintTransformer {
+  private _opt: HintTransformerOption;
   private _program: ts.Program;
   private _printer: ts.Printer;
 
-  constructor(opt: MockTransformerOption) {
+  constructor(opt: HintTransformerOption) {
     this._opt = opt;
     this._program = ts.createProgram(opt.files, opt.tsconfig || {});
     this._printer = ts.createPrinter({
@@ -28,8 +29,8 @@ export class MockTransformer {
     });
   }
 
-  public compile(): MockTransformResult[] {
-    const result: MockTransformResult[] = [];
+  public compile(): HintTransformermResult[] {
+    const result: HintTransformermResult[] = [];
     const sources = this._program.getSourceFiles();
     for (const src of sources) {
       const idx = this._opt.files.indexOf(src.fileName);
@@ -40,6 +41,7 @@ export class MockTransformer {
       ]);
       if (dest.transformed.length === 1 && dest.transformed[0]) {
         result.push({
+          filename: src.fileName,
           source: this._printer.printFile(dest.transformed[0] as ts.SourceFile)
         });
       }

@@ -1,13 +1,13 @@
 import { IF2ConstFactory } from '../IF2Const';
-import { MockTransformer, Factory } from '../MockTransformer';
+import { HintTransformer, HintTransformerFactory } from '../HintTransformer';
 
-const factory: Factory = src => {
+const factory: HintTransformerFactory = src => {
   return IF2ConstFactory(src.fileName);
 };
 
 describe('IF2Const', () => {
   test('transform simple interface', () => {
-    const trfmr = new MockTransformer({
+    const trfmr = new HintTransformer({
       files: ['example/simple.d.ts'],
       transformers: [],
       transformerFactories: [factory]
@@ -25,7 +25,7 @@ export const SimpleHints: Simple = {
   });
 
   test('transform nested interface', () => {
-    const trfmr = new MockTransformer({
+    const trfmr = new HintTransformer({
       files: ['example/nest.d.ts'],
       transformers: [],
       transformerFactories: [factory]
@@ -51,7 +51,7 @@ export const NestHints: Nest = {
   });
 
   test('transform interface with string[]', () => {
-    const trfmr = new MockTransformer({
+    const trfmr = new HintTransformer({
       files: ['example/stringArr.d.ts'],
       transformers: [],
       transformerFactories: [factory]
@@ -75,7 +75,7 @@ export const StringArrHints: StringArr = {
   });
 
   test('transform interface with Array<string>', () => {
-    const trfmr = new MockTransformer({
+    const trfmr = new HintTransformer({
       files: ['example/stringArr2.d.ts'],
       transformers: [],
       transformerFactories: [factory]
@@ -99,7 +99,7 @@ export const StringArr2Hints: StringArr2 = {
   });
 
   test('transform interface with object array', () => {
-    const trfmr = new MockTransformer({
+    const trfmr = new HintTransformer({
       files: ['example/ObjectArr.d.ts'],
       transformers: [],
       transformerFactories: [factory]
@@ -130,7 +130,7 @@ export const ObjectArrHints: ObjectArr = {
   });
 
   test('transform interface with object array', () => {
-    const trfmr = new MockTransformer({
+    const trfmr = new HintTransformer({
       files: ['example/ObjectArr2.d.ts'],
       transformers: [],
       transformerFactories: [factory]
