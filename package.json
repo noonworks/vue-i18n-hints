@@ -7,10 +7,6 @@
     "url": "git+https://github.com/noonworks/nuxt-i18n-hints.git"
   },
   "main": "dist/lib/index.js",
-  "bin": "dist/bin/index.js",
-  "files": [
-    "dist"
-  ],
   "author": "@noonworks",
   "license": "MIT",
   "private": true,
