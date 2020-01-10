@@ -1,1 +1,3 @@
-# nuxt-i18n-hints
+# vue-i18n-hints
+
+**This repo is WIP.**

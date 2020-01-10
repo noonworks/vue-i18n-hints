@@ -1,10 +1,10 @@
 {
-  "name": "nuxt-i18n-hints",
-  "description": "Generate hint files for nuxt-i18n.",
-  "version": "1.0.0",
+  "name": "vue-i18n-hints",
+  "description": "Generate hint files for vue-i18n.",
+  "version": "0.1.0",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/noonworks/nuxt-i18n-hints.git"
+    "url": "git+https://github.com/noonworks/vue-i18n-hints.git"
   },
   "main": "dist/lib/index.js",
   "author": "@noonworks",
