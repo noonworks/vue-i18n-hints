@@ -4,8 +4,7 @@ import { IF2ConstFactory } from './IF2Const';
 
 export interface HintCompilerOptions {
   sourceDir: string;
-  hintsDir: string;
-  jsDir: string;
+  outDir: string;
   postfix: string;
 }
 
@@ -17,13 +16,12 @@ export class HintCompiler {
     opt = opt || {};
     this._opt = {
       sourceDir: opt.sourceDir || 'lang/src',
-      hintsDir: opt.hintsDir || 'lang/build',
-      jsDir: opt.jsDir || 'lang/build',
+      outDir: opt.outDir || 'lang/build',
       postfix: opt.postfix || 'Hints'
     };
     this._pmgr = new PathManager({
       sourceDir: this._opt.sourceDir,
-      hintsDir: this._opt.hintsDir,
+      hintsDir: this._opt.outDir,
       postfix: this._opt.postfix
     });
   }
