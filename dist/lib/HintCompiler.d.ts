@@ -1,7 +1,6 @@
 export interface HintCompilerOptions {
     sourceDir: string;
-    hintsDir: string;
-    jsDir: string;
+    outDir: string;
     postfix: string;
 }
 export declare class HintCompiler {
