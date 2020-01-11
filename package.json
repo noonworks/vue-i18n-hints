@@ -7,6 +7,9 @@
     "url": "git+https://github.com/noonworks/vue-i18n-hints.git"
   },
   "main": "dist/lib/index.js",
+  "files": [
+    "dist"
+  ],
   "author": "@noonworks",
   "license": "MIT",
   "private": true,
