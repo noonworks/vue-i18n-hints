@@ -1,3 +1,4 @@
 import { HintCompiler } from './HintCompiler';
 import { MiniTranspiler } from './MiniTranspiler';
-export { HintCompiler, MiniTranspiler };
+import { PathManager } from './PathManager';
+export { HintCompiler, MiniTranspiler, PathManager };
