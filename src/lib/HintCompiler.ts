@@ -8,6 +8,17 @@ export interface HintCompilerOptions {
   postfix: string;
 }
 
+interface ResultPath {
+  source: string;
+  destination: string;
+  error?: Error | string;
+}
+
+interface Result {
+  succeed: ResultPath[];
+  failed: ResultPath[];
+}
+
 export class HintCompiler {
   private _opt: HintCompilerOptions;
   private _pmgr: PathManager;
@@ -26,7 +37,7 @@ export class HintCompiler {
     });
   }
 
-  public compile(files: string[]): void {
+  public compile(files: string[]): Result {
     const factory: HintTransformerFactory = src => {
       return IF2ConstFactory(this._pmgr.importPath(src.fileName));
     };
@@ -35,16 +46,16 @@ export class HintCompiler {
       transformers: [],
       transformerFactories: [factory]
     });
-    const result = trsfmr.compile();
-    result.forEach(r => {
-      const i = files.indexOf(r.filename);
-      if (i < 0) return;
-      this.save(this._pmgr.dest(files[i]), r.source);
+    const result: Result = { succeed: [], failed: [] };
+    const compiled = trsfmr.compile();
+    compiled.forEach(r => {
+      if (!this._pmgr.inDir(this._opt.sourceDir, r.filename)) return;
+      const destination = this._pmgr.dest(r.filename);
+      if (destination.length === 0 || r.source.length === 0) return;
+      const err = this._pmgr.save(destination, r.source);
+      if (!err) result.succeed.push({ source: r.filename, destination });
+      else result.failed.push({ source: r.filename, destination, error: err });
     });
-  }
-
-  private save(file: string, source: string): void {
-    if (file.length === 0 || source.length === 0) return;
-    this._pmgr.save(file, source);
+    return result;
   }
 }

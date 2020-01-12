@@ -96,4 +96,15 @@ describe('PathManager', () => {
       expect(dist).toBe(posix.join('lang', 'simpleHints.ts'));
     }
   });
+
+  test('check path', () => {
+    const mgr = new PathManager({
+      sourceDir: 'lang/src',
+      hintsDir: 'lang/build',
+      postfix: 'Hints'
+    });
+    expect(mgr.inDir('lang/src', 'lang/src/test.ts')).toBeTruthy();
+    expect(mgr.inDir('lang/src', 'lang/build/test.ts')).toBeFalsy();
+    expect(mgr.inDir('lang/src', 'node_modules/test/test.ts')).toBeFalsy();
+  });
 });

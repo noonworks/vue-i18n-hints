@@ -44,9 +44,20 @@ export class PathManager {
     return posix.normalize(imp);
   }
 
-  public save(path: string, source: string): void {
+  public inDir(dir: string, file: string): boolean {
+    const absDir = posix.resolve(dir);
+    const absFile = posix.resolve(file);
+    return absFile.indexOf(absDir) === 0;
+  }
+
+  public save(path: string, source: string): Error | null {
     const dir = posix.dirname(path);
-    mkdirSync(dir, { recursive: true });
-    writeFileSync(path, source);
+    try {
+      mkdirSync(dir, { recursive: true });
+      writeFileSync(path, source);
+      return null;
+    } catch (error) {
+      return error;
+    }
   }
 }

@@ -8,7 +8,12 @@ describe('HintCompiler', () => {
     unlink([dest]);
     expect(exists([dest])).toBe(ExistsResult.AllNothing);
     const compiler = new HintCompiler();
-    compiler.compile([src]);
+    const result = compiler.compile([src]);
+    expect(result.succeed.length).toBe(1);
+    expect(result.succeed[0].source).toEqual(src);
+    expect(result.succeed[0].destination).toEqual(dest);
+    expect(result.succeed[0].error).toBeFalsy();
+    expect(result.failed.length).toBe(0);
     const exs = exists([dest]);
     expect(exs).toBe(ExistsResult.AllExists);
     if (exs != ExistsResult.AllExists) return;
