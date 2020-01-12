@@ -30,10 +30,21 @@ class PathManager {
         const imp = path_1.posix.join(impdir, this.getBase(path).base);
         return path_1.posix.normalize(imp);
     }
+    inDir(dir, file) {
+        const absDir = path_1.posix.resolve(dir);
+        const absFile = path_1.posix.resolve(file);
+        return absFile.indexOf(absDir) === 0;
+    }
     save(path, source) {
         const dir = path_1.posix.dirname(path);
-        fs_1.mkdirSync(dir, { recursive: true });
-        fs_1.writeFileSync(path, source);
+        try {
+            fs_1.mkdirSync(dir, { recursive: true });
+            fs_1.writeFileSync(path, source);
+            return null;
+        }
+        catch (error) {
+            return error;
+        }
     }
 }
 exports.PathManager = PathManager;

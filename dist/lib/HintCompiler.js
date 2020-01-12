@@ -26,18 +26,21 @@ class HintCompiler {
             transformers: [],
             transformerFactories: [factory]
         });
-        const result = trsfmr.compile();
-        result.forEach(r => {
-            const i = files.indexOf(r.filename);
-            if (i < 0)
+        const result = { succeed: [], failed: [] };
+        const compiled = trsfmr.compile();
+        compiled.forEach(r => {
+            if (!this._pmgr.inDir(this._opt.sourceDir, r.filename))
                 return;
-            this.save(this._pmgr.dest(files[i]), r.source);
+            const destination = this._pmgr.dest(r.filename);
+            if (destination.length === 0 || r.source.length === 0)
+                return;
+            const err = this._pmgr.save(destination, r.source);
+            if (!err)
+                result.succeed.push({ source: r.filename, destination });
+            else
+                result.failed.push({ source: r.filename, destination, error: err });
         });
-    }
-    save(file, source) {
-        if (file.length === 0 || source.length === 0)
-            return;
-        this._pmgr.save(file, source);
+        return result;
     }
 }
 exports.HintCompiler = HintCompiler;

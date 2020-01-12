@@ -11,6 +11,7 @@ export declare class PathManager {
     private getDestFilename;
     dest(src: string): string;
     importPath(path: string): string;
-    save(path: string, source: string): void;
+    inDir(dir: string, file: string): boolean;
+    save(path: string, source: string): Error | null;
 }
 export {};
